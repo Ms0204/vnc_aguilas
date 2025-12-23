@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'aguilas_saber_db',
         'USER': 'postgres',
-        'PASSWORD': 'tu_password',  # Cambia esto por tu contraseña de PostgreSQL
+        'PASSWORD': '2112',
         'HOST': 'localhost',
         'PORT': '5432',
     }
