@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Aguilas del Saber{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .welcome-message {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .card-stat {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 6px 16px rgba(220, 53, 69, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 3px solid #000;
+    }
+
+    .card-stat:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
+    }
+
+    .card-stat h3 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 6px 0;
+    }
+
+    .card-stat p {
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .card-stat i {
+        font-size: 1.6rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .chart-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .chart-header {
+        padding: 15px 20px;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        background: #000;
+        text-align: center;
+    }
+
+    .chart-body {
+        padding: 20px;
+        min-height: 250px;
+        max-height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    canvas {
+        max-width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome-message {
+            font-size: 1.3rem;
+        }
+
+        .card-stat h3 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="welcome-message">Bienvenido, {{ usuario_nombre }}! 👋</h1>
+
+<!-- Estadísticas Rápidas -->
+<div class="stats-container">
+    <div class="card-stat">
+        <i class="fas fa-users" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3>{{ usuarios }}</h3>
+        <p>Usuarios Activos</p>
+    </div>
+
+    <div class="card-stat">
+        <i class="fas fa-database" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3>{{ recursos }}</h3>
+        <p>Recursos Disponibles</p>
+    </div>
+
+    <div class="card-stat">
+        <i class="fas fa-archive" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3>{{ prestamos }}</h3>
+        <p>Préstamos Totales</p>
+    </div>
+
+    <div class="card-stat">
+        <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3>{{ prestamos_pendientes }}</h3>
+        <p>Préstamos Pendientes</p>
+    </div>
+
+    <div class="card-stat">
+        <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 10px;"></i>
+        <h3>{{ productos }}</h3>
+        <p>Productos Registrados</p>
+    </div>
+</div>
+
+<!-- Gráficos -->
+<div class="charts-grid">
+    <!-- Gestión de Productos -->
+    <div class="chart-card">
+        <div class="chart-header">Gestión de Productos</div>
+        <div class="chart-body">
+            <canvas id="productosChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Productos por Mes -->
+    <div class="chart-card">
+        <div class="chart-header">Productos por Mes</div>
+        <div class="chart-body">
+            <canvas id="productosMesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Estado de Recursos -->
+    <div class="chart-card">
+        <div class="chart-header">Estado de Recursos</div>
+        <div class="chart-body">
+            <canvas id="recursosChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Datos seguros para Productos por Mes
+    const productosMesLabels = JSON.parse('{{ productos_mes_labels_json|escapejs|default:"[]" }}');
+    const productosMesData = JSON.parse('{{ productos_mes_data_json|escapejs|default:"[]" }}');
+
+    // Gráfico 1: Gestión de Productos
+    new Chart(document.getElementById('productosChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Entrada', 'Salida', 'Disponible'],
+            datasets: [{
+                label: 'Cantidad',
+                data: [
+                    {{ productos_estado.entrada|default:0 }},
+                    {{ productos_estado.salida|default:0 }},
+                    {{ productos_estado.disponible|default:0 }}
+                ],
+                backgroundColor: ['#4db8ac', '#4fc3f7', '#81c784'],
+                borderRadius: 6,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: { family: "'Poppins', sans-serif" },
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { family: "'Poppins', sans-serif" }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico 2: Productos por Mes
+    new Chart(document.getElementById('productosMesChart'), {
+        type: 'bar',
+        data: {
+            labels: productosMesLabels,
+            datasets: [{
+                label: 'Cantidad',
+                data: productosMesData,
+                backgroundColor: '#4db8ac',
+                borderRadius: 6,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        font: { family: "'Poppins', sans-serif" },
+                        stepSize: 1
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: { family: "'Poppins', sans-serif" }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico 3: Estado de Recursos (Pie)
+    new Chart(document.getElementById('recursosChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Disponible', 'No Disponible', 'Mantenimiento'],
+            datasets: [{
+                data: [
+                    {{ recursos_estado.disponible|default:0 }},
+                    {{ recursos_estado.no_disponible|default:0 }},
+                    {{ recursos_estado.mantenimiento|default:0 }}
+                ],
+                backgroundColor: ['#4caf50', '#dc3545', '#f0ad4e'],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: { family: "'Poppins', sans-serif", size: 11 },
+                        padding: 10,
+                        boxWidth: 15
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

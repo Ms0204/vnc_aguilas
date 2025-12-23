@@ -1,0 +1,63 @@
+{% load static %}
+
+<div class="sidebar-header">
+    <div class="sidebar-logo">
+        <img src="{% static 'img/logo.png' %}?v={% now 'timestamp' %}" alt="Logo Aguilas del Saber">
+    </div>
+    <h4>Aguilas del Saber</h4>
+    <p>Sistema de Gestión</p>
+</div>
+
+<ul class="nav flex-column">
+    <!-- Inicio -->
+    <li>
+        <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="fas fa-home"></i>Inicio
+        </a>
+    </li>
+
+    <!-- Dashboard -->
+    <li>
+        <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="fas fa-tachometer-alt"></i>Dashboard
+        </a>
+    </li>
+
+    <!-- Administración -->
+    <li>
+        <a class="nav-link" data-bs-toggle="collapse" href="#adminSubmenu" role="button">
+            <i class="fas fa-cogs"></i>Administración
+            <i class="fas fa-chevron-down ms-auto"></i>
+        </a>
+        <ul class="collapse nav-submenu" id="adminSubmenu">
+            <li>
+                <a href="{% url 'usuarios_lista' %}" class="nav-link {% if 'usuario' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-users"></i>Usuarios
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'recursos_lista' %}" class="nav-link {% if 'recurso' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-database"></i>Recursos
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'prestamos_lista' %}" class="nav-link {% if 'prestamo' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-archive"></i>Préstamos
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'productos_lista' %}" class="nav-link {% if 'producto' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-shopping-cart"></i>Productos
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<!-- Logout -->
+<form method="POST" action="{% url 'logout' %}" class="mt-auto">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-logout">
+        <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+    </button>
+</form>

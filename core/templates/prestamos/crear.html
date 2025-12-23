@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}Crear Préstamo - Aguilas del Saber{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 600px;
+    }
+
+    .form-card h1 {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 12px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 12px;
+        background: #e0e0e0;
+        color: #333;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-cancel:hover {
+        background: #d0d0d0;
+        transform: translateY(-2px);
+    }
+
+    .error {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h1><i class="fas fa-file-alt"></i> Crear Nuevo Préstamo</h1>
+
+    {% if error %}
+    <div class="error">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="codigo">
+                <i class="fas fa-barcode" style="color: #dc3545; margin-right: 8px;"></i>Código
+            </label>
+            <input type="text" id="codigo" name="codigo" placeholder="PRE-001" required>
+        </div>
+
+        <div class="form-group">
+            <label for="usuario_id">
+                <i class="fas fa-user" style="color: #dc3545; margin-right: 8px;"></i>Usuario
+            </label>
+            <select id="usuario_id" name="usuario_id" required>
+                <option value="">-- Seleccionar Usuario --</option>
+                {% for usuario in usuarios %}
+                <option value="{{ usuario.id }}">{{ usuario.nombre }} {{ usuario.apellido }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="recurso_id">
+                <i class="fas fa-box" style="color: #dc3545; margin-right: 8px;"></i>Recurso
+            </label>
+            <select id="recurso_id" name="recurso_id" required>
+                <option value="">-- Seleccionar Recurso --</option>
+                {% for recurso in recursos %}
+                <option value="{{ recurso.id }}">{{ recurso.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_prestamo">
+                <i class="fas fa-calendar" style="color: #dc3545; margin-right: 8px;"></i>Fecha Préstamo
+            </label>
+            <input type="date" id="fecha_prestamo" name="fecha_prestamo" required>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_devolucion">
+                <i class="fas fa-undo" style="color: #dc3545; margin-right: 8px;"></i>Fecha Devolución
+            </label>
+            <input type="date" id="fecha_devolucion" name="fecha_devolucion">
+        </div>
+
+        <div class="form-group">
+            <label for="estado">
+                <i class="fas fa-info-circle" style="color: #dc3545; margin-right: 8px;"></i>Estado
+            </label>
+            <select id="estado" name="estado" required>
+                <option value="pendiente">⏳ Pendiente</option>
+                <option value="entregado">📦 Entregado</option>
+                <option value="devuelto">✓ Devuelto</option>
+                <option value="cancelado">✗ Cancelado</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save me-2"></i> Guardar
+            </button>
+            <a href="{% url 'prestamos_lista' %}" class="btn-cancel">
+                <i class="fas fa-times me-2"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

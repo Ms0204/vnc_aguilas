@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Editar Producto - Aguilas del Saber{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 600px;
+    }
+
+    .form-card h1 {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    input:focus,
+    select:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        flex: 1;
+        padding: 12px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .btn-cancel {
+        flex: 1;
+        padding: 12px;
+        background: #e0e0e0;
+        color: #333;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-cancel:hover {
+        background: #d0d0d0;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <h1><i class="fas fa-edit"></i> Editar Producto</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="nombre">
+                <i class="fas fa-box"></i>Nombre
+            </label>
+            <input type="text" id="nombre" name="nombre" value="{{ producto.nombre }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad">
+                <i class="fas fa-boxes"></i>Cantidad
+            </label>
+            <input type="number" id="cantidad" name="cantidad" value="{{ producto.cantidad }}" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label for="estado">
+                <i class="fas fa-info-circle"></i>Estado
+            </label>
+            <select id="estado" name="estado" required>
+                <option value="entrada" {% if producto.estado == 'entrada' %}selected{% endif %}>Entrada</option>
+                <option value="salida" {% if producto.estado == 'salida' %}selected{% endif %}>Salida</option>
+                <option value="disponible" {% if producto.estado == 'disponible' %}selected{% endif %}>Disponible</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_entrada">
+                <i class="fas fa-calendar-plus"></i>Fecha Entrada
+            </label>
+            <input type="date" id="fecha_entrada" name="fecha_entrada" value="{{ producto.fecha_entrada }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="fecha_salida">
+                <i class="fas fa-calendar-minus"></i>Fecha Salida
+            </label>
+            <input type="date" id="fecha_salida" name="fecha_salida" value="{{ producto.fecha_salida|default:'' }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Guardar Cambios
+            </button>
+            <a href="{% url 'productos_lista' %}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
