@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'aguilas_saber.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'aguilas_saber_db',
+        'USER': 'postgres',
+        'PASSWORD': 'tu_password',  # Cambia esto por tu contraseña de PostgreSQL
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

@@ -50,6 +50,11 @@
                     <i class="fas fa-shopping-cart"></i>Productos
                 </a>
             </li>
+            <li>
+                <a href="{% url 'roles_lista' %}" class="nav-link {% if 'role' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-user-shield"></i>Roles
+                </a>
+            </li>
         </ul>
     </li>
 </ul>

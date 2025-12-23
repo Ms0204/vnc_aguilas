@@ -166,6 +166,22 @@
             <input type="password" id="password" name="password" placeholder="••••••••" required>
         </div>
 
+        <div class="form-group">
+            <label>
+                <i class="fas fa-user-shield"></i> Roles
+            </label>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+                {% for role in roles %}
+                <label style="display:flex; align-items:center; gap:8px; background:#f9f9f9; border:1px solid #eee; border-radius:8px; padding:10px;">
+                    <input type="checkbox" name="roles" value="{{ role.id }}">
+                    <span>{{ role.nombre }}</span>
+                </label>
+                {% empty %}
+                <span style="color:#999;">No hay roles disponibles.</span>
+                {% endfor %}
+            </div>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn-submit">
                 <i class="fas fa-save me-2"></i> Guardar

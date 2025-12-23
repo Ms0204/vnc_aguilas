@@ -104,7 +104,7 @@ def usuarios_lista(request):
     if 'usuario_id' not in request.session:
         return redirect('login')
     
-    usuarios = Usuario.objects.all().order_by('-created_at')
+    usuarios = Usuario.objects.all().prefetch_related('roles').order_by('-created_at')
     
     if request.GET.get('q'):
         query = request.GET.get('q')
@@ -445,3 +445,67 @@ def producto_eliminar(request, id):
     producto = get_object_or_404(Producto, id=id)
     producto.delete()
     return redirect('productos_lista')
+
+# ========== ROLES ==========
+def roles_lista(request):
+    """Listar roles"""
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    roles = Role.objects.all().prefetch_related('usuarios')
+    return render(request, 'roles/lista.html', {'roles': roles})
+
+def role_crear(request):
+    """Crear rol"""
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        
+        if not nombre:
+            return render(request, 'roles/crear.html', {'error': 'El nombre del rol es obligatorio'})
+        
+        # Verificar si el nombre ya existe
+        if Role.objects.filter(nombre=nombre).exists():
+            return render(request, 'roles/crear.html', {'error': 'Ya existe un rol con ese nombre'})
+        
+        Role.objects.create(nombre=nombre, descripcion=descripcion)
+        return redirect('roles_lista')
+    
+    return render(request, 'roles/crear.html')
+
+def role_editar(request, id):
+    """Editar rol"""
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    role = get_object_or_404(Role, id=id)
+    
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre', '').strip()
+        descripcion = request.POST.get('descripcion', '').strip()
+        
+        if not nombre:
+            return render(request, 'roles/editar.html', {'role': role, 'error': 'El nombre del rol es obligatorio'})
+        
+        # Verificar si el nombre ya existe en otro rol
+        if Role.objects.filter(nombre=nombre).exclude(id=id).exists():
+            return render(request, 'roles/editar.html', {'role': role, 'error': 'Ya existe un rol con ese nombre'})
+        
+        role.nombre = nombre
+        role.descripcion = descripcion
+        role.save()
+        return redirect('roles_lista')
+    
+    return render(request, 'roles/editar.html', {'role': role})
+
+def role_eliminar(request, id):
+    """Eliminar rol"""
+    if 'usuario_id' not in request.session:
+        return redirect('login')
+    
+    role = get_object_or_404(Role, id=id)
+    role.delete()
+    return redirect('roles_lista')
